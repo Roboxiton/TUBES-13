@@ -129,9 +129,9 @@ func lihatData(d *tabMindstone, j *int) {
 		fmt.Println("Belum ada data yang dimasukkan.")
 	} else {
 		for enter != "X" && enter != "x" {
-			fmt.Printf("%-15s %-15s %-10s %-10s %-10s %-10s\n", "Nama Tugas", "Deadline", "Prioritas", "Progress", "Mood", "Stress")
+			fmt.Printf("%-10s %-15s %-15s %-10s %-10s %-10s %-10s\n", "ID", "Nama Tugas", "Deadline", "Prioritas", "Progress", "Mood", "Stress")
 			for i = 0; i < *j; i++ {
-				fmt.Printf("%-15s %d/%d/%-11d %-10d %-10.2f %-10d %-10.2f\n", d[i].namaTugas, d[i].dTanggal, d[i].dBulan, d[i].dTahun, d[i].prioritas, d[i].progress, d[i].mood, d[i].stress)
+				fmt.Printf("%-10d %-15s %d/%d/%-11d %-10d %-10.2f %-10d %-10.2f\n", i, d[i].namaTugas, d[i].dTanggal, d[i].dBulan, d[i].dTahun, d[i].prioritas, d[i].progress, d[i].mood, d[i].stress)
 
 			}
 			fmt.Println("Tekan X untuk kembali ke menu utama atau tekan Y untuk melihat data lagi.")
@@ -186,6 +186,7 @@ func cariData(d *tabMindstone, j *int) {
 		for enter != "X" && enter != "x" {
 			fmt.Print("Masukkan deadline yang ingin dicari (format: tanggal bulan tahun): ")
 			fmt.Scan(&tanggal, &bulan, &tahun)
+			SelectionDeadline(d, j)
 			idx = BinaryTanggal(*d, *j, tanggal, bulan, tahun)
 			if idx == -1 {
 				fmt.Printf("Data tidak ditemukan untuk deadline: %d/%d/%d\n", tanggal, bulan, tahun)
@@ -297,15 +298,15 @@ func hapusData(d *tabMindstone, j *int) {
 	var i, idx int
 	var enter string
 	for enter != "X" && enter != "x" {
-		fmt.Print("Masukkan index yang ingin dihapus: ")
+		fmt.Print("Masukkan ID yang ingin dihapus: ")
 		fmt.Scan(&idx)
 		if idx < 0 || idx >= *j {
-			fmt.Println("Index tidak valid.")
+			fmt.Println("ID tidak valid.")
 			return
 		}
 		if idx < *j {
 			fmt.Println("Data yang akan dihapus: ")
-			fmt.Printf("%-15s %d/%d/%-11d %-10d %-10.2f %-10d %-10.2f\n", d[idx].namaTugas, d[idx].dTanggal, d[idx].dBulan, d[idx].dTahun, d[idx].prioritas, d[idx].progress, d[idx].mood, d[idx].stress)
+			fmt.Printf("%-10d %-15s %d/%d/%-11d %-10d %-10.2f %-10d %-10.2f\n", idx, d[idx].namaTugas, d[idx].dTanggal, d[idx].dBulan, d[idx].dTahun, d[idx].prioritas, d[idx].progress, d[idx].mood, d[idx].stress)
 			fmt.Print("Apakah Anda yakin ingin menghapus data ini? (Y/N): ")
 			fmt.Scan(&enter)
 			for enter != "Y" && enter != "y" && enter != "N" && enter != "n" {
@@ -335,8 +336,8 @@ func urutkanData(d *tabMindstone, j *int) {
 	var enter string
 	for enter != "X" && enter != "x" {
 		fmt.Println("Pilih metode pengurutan: ")
-		fmt.Print("1. Urutkan berdasarkan prioritas (Selection Sort)\n")
-		fmt.Print("2. Urutkan berdasarkan mood (Insertion Sort)\n")
+		fmt.Print("1. Urutkan berdasarkan prioritas (Selection Sort secara Descending)\n")
+		fmt.Print("2. Urutkan berdasarkan mood (Insertion Sort secara Ascending)\n")
 		fmt.Print("3. Kembali ke menu utama\n")
 		fmt.Scan(&idx)
 		for idx < 1 || idx > 3 {
@@ -465,6 +466,34 @@ func insertionMood(d *tabMindstone, j *int) {
 			i--
 		}
 		d[i] = temp
+		pass++
+	}
+}
+
+func SelectionDeadline(d *tabMindstone, j *int) {
+	var i, idx, pass int
+	var temp mindstone
+	pass = 1
+	for pass < *j {
+		idx = pass - 1
+		i = pass
+		for i < *j {
+			if d[idx].dTahun > d[i].dTahun {
+				idx = i
+			} else if d[idx].dTahun == d[i].dTahun {
+				if d[idx].dBulan > d[i].dBulan {
+					idx = i
+				} else if d[idx].dBulan == d[i].dBulan {
+					if d[idx].dTanggal > d[i].dTanggal {
+						idx = i
+					}
+				}
+			}
+			i++
+		}
+		temp = d[pass-1]
+		d[pass-1] = d[idx]
+		d[idx] = temp
 		pass++
 	}
 }
